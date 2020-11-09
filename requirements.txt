@@ -6,3 +6,4 @@ nbconvert
 nbformat
 plotly
 flask
+gunicorn
