@@ -1,0 +1,7 @@
+pandas
+numpy
+jupyter
+papermill
+nbconvert
+nbformat
+plotly
