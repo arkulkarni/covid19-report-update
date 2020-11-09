@@ -5,3 +5,4 @@ papermill
 nbconvert
 nbformat
 plotly
+flask

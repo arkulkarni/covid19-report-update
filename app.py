@@ -6,7 +6,20 @@ import gc
 from nbconvert import HTMLExporter
 from nbconvert.writers import FilesWriter
 
+import os
+
+from flask import Flask
+
 SCRATCH_DIR = 'scratch'
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def hello_world():
+    name = os.environ.get('NAME', 'World')
+    return 'Hello {}!'.format(name)
+
 
 def main_report_generation_function():
     print('START: downloading and executing notebook from github')
@@ -49,7 +62,9 @@ def main_report_generation_function():
     # print('SUCCESS: uploading html file to S3')
 
     gc.collect()
+    return 'Done processing and updating the report'
 
-# Trigger main function here
-main_report_generation_function()
+
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 

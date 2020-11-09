@@ -1,1 +1,1 @@
-"# Runs update of an html report based on Jupyter notebook" 
+Runs update of an html report based on Jupyter notebook
