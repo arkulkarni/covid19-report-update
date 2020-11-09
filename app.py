@@ -16,53 +16,48 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    name = os.environ.get('NAME', 'World')
-    return 'Hello {}!'.format(name)
+def main_report_generation_function():
+    print('START: downloading and executing notebook from github')
+    pm.execute_notebook(
+       'https://raw.githubusercontent.com/arkulkarni/COVID-19-Analysis/master/COVID-19-Analysis.ipynb',
+       SCRATCH_DIR + '/output.ipynb'
+    )
+
+    print('SUCCESS: downloading and executing notebook from github')
 
 
-# def main_report_generation_function():
-#     print('START: downloading and executing notebook from github')
-#     pm.execute_notebook(
-#        'https://raw.githubusercontent.com/arkulkarni/COVID-19-Analysis/master/COVID-19-Analysis.ipynb',
-#        SCRATCH_DIR + '/output.ipynb'
-#     )
+    print('START: convert to html')
+    #jupyter nbconvert output.ipynb --no-input
+    nb = nbformat.read(SCRATCH_DIR + '/output.ipynb', as_version=4)
 
-#     print('SUCCESS: downloading and executing notebook from github')
+    # Instantiate the exporter. 
+    html_exporter = HTMLExporter()
+    # html_exporter.template_file = 'nbhtml'
 
+    (body, resources) = html_exporter.from_notebook_node(nb)
 
-#     print('START: convert to html')
-#     #jupyter nbconvert output.ipynb --no-input
-#     nb = nbformat.read(SCRATCH_DIR + '/output.ipynb', as_version=4)
+    print('SUCCESS: convert to html')
 
-#     # Instantiate the exporter. 
-#     html_exporter = HTMLExporter()
-#     # html_exporter.template_file = 'nbhtml'
+    print('START: save html file')
 
-#     (body, resources) = html_exporter.from_notebook_node(nb)
+    write_file = FilesWriter()
+    write_file.write(
+        output=body,
+        resources=resources,
+        notebook_name=SCRATCH_DIR + '/index'
+        )
 
-#     print('SUCCESS: convert to html')
+    print('SUCCESS: save html file')
 
-#     print('START: save html file')
+    # print('START: uploading html file to S3')
 
-#     write_file = FilesWriter()
-#     write_file.write(
-#         output=body,
-#         resources=resources,
-#         notebook_name=SCRATCH_DIR + '/index'
-#         )
+    # s3_client = boto3.client('s3')
+    # s3_client.upload_file('/tmp/index.html', 'covid19report', 'index.html', ExtraArgs={'ContentType': "text/html"})
 
-#     print('SUCCESS: save html file')
+    # print('SUCCESS: uploading html file to S3')
 
-#     # print('START: uploading html file to S3')
-
-#     # s3_client = boto3.client('s3')
-#     # s3_client.upload_file('/tmp/index.html', 'covid19report', 'index.html', ExtraArgs={'ContentType': "text/html"})
-
-#     # print('SUCCESS: uploading html file to S3')
-
-#     gc.collect()
-#     return 'Done processing and updating the report'
+    gc.collect()
+    return 'Done processing and updating the report'
 
 
 if __name__ == "__main__":
