@@ -10,7 +10,7 @@ import os
 
 from flask import Flask
 
-SCRATCH_DIR = 'scratch'
+SCRATCH_DIR = '.'
 
 app = Flask(__name__)
 
