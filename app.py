@@ -12,10 +12,6 @@ from google.cloud import storage
 SCRATCH_DIR = '.'
 BUCKET_NAME = 'covid19report'
 
-app = Flask(__name__)
-
-
-@app.route('/')
 def main_report_generation_function():
     print('START: downloading and executing notebook from github')
     pm.execute_notebook(
@@ -53,19 +49,29 @@ def main_report_generation_function():
 
     storage_client = storage.Client()
     bucket = storage_client.bucket(BUCKET_NAME)
+    
+    # upload the index.html file
     blob = bucket.blob('index.html')
-
     blob.upload_from_filename(SCRATCH_DIR + '/index.html')
+    print('File index.html uploaded')
 
-    print("File {} uploaded to {}.".format(SCRATCH_DIR + '/index.html', 'index.html'))
+    # upload the custom.css file
+    blob = bucket.blob('custom.css')
+    blob.upload_from_filename('./custom.css')
+    print('File custom.css uploaded')
 
-    # s3_client = boto3.client('s3')
-    # s3_client.upload_file('/tmp/index.html', 'covid19report', 'index.html', ExtraArgs={'ContentType': "text/html"})
-
-    print('SUCCESS: uploading html file to Cloud Storage')
+    print('SUCCESS: uploading html and css file to Cloud Storage')
 
     gc.collect()
     return 'Done processing and updating the report'
+
+
+#Flask scaffolding for Cloud Run
+app = Flask(__name__)
+
+@app.route('/')
+def handle_route_function():
+    return main_report_generation_function()
 
 
 if __name__ == "__main__":
