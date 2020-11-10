@@ -2,15 +2,15 @@ import json
 import papermill as pm
 import nbformat
 import gc
-
 from nbconvert import HTMLExporter
 from nbconvert.writers import FilesWriter
-
 import os
-
 from flask import Flask
+from google.cloud import storage
+
 
 SCRATCH_DIR = '.'
+BUCKET_NAME = 'covid19report'
 
 app = Flask(__name__)
 
@@ -49,12 +49,20 @@ def main_report_generation_function():
 
     print('SUCCESS: save html file')
 
-    # print('START: uploading html file to S3')
+    print('START: uploading html file to Cloud Storage')
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob('index.html')
+
+    blob.upload_from_filename(SCRATCH_DIR + '/index.html')
+
+    print("File {} uploaded to {}.".format(SCRATCH_DIR + '/index.html', 'index.html'))
 
     # s3_client = boto3.client('s3')
     # s3_client.upload_file('/tmp/index.html', 'covid19report', 'index.html', ExtraArgs={'ContentType': "text/html"})
 
-    # print('SUCCESS: uploading html file to S3')
+    print('SUCCESS: uploading html file to Cloud Storage')
 
     gc.collect()
     return 'Done processing and updating the report'

@@ -7,3 +7,4 @@ nbformat
 plotly
 flask
 gunicorn
+google-cloud-storage
