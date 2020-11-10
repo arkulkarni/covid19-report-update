@@ -32,7 +32,7 @@ def main_report_generation_function():
 
     # Instantiate the exporter. 
     html_exporter = HTMLExporter()
-    # html_exporter.template_file = 'nbhtml'
+    html_exporter.template_file = 'nbhtml'
 
     (body, resources) = html_exporter.from_notebook_node(nb)
 
